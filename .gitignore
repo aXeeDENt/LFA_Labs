@@ -1,0 +1,40 @@
+# Build Folders
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+
+# Logs
+*.log
+
+# Compiled DLLs
+*.dll
+*.exe
+*.pdb
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# Temporary files
+*.cache
+*.tmp
+*.pid
+*.swp
+*.swo
+
+# Resharper
+_ReSharper.Caches/
+*.DotSettings.user
