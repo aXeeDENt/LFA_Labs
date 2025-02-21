@@ -8,7 +8,7 @@ namespace LFA_Lab1
     {
         public HashSet<char> V_N = new HashSet<char> {'S', 'A', 'B', 'C'};
         public HashSet<char> V_T = new HashSet<char> {'a', 'b', 'c', 'd'};
-        public char S = 'S';
+        public string S = "S";
         public Dictionary<char,List<string>> P = new Dictionary<char, List<string>>
         {
             { 'S', new List<string> { "dA" } },
@@ -32,8 +32,6 @@ namespace LFA_Lab1
                     {
                         List<string> productions = P[currentChar];
                         string chosenProduction = productions[rand.Next(productions.Count)];
-
-                        // Replace currentChar with the chosen production
                         word.Remove(i, 1);
                         word.Insert(i, chosenProduction);
                         replaced = true;
@@ -44,11 +42,5 @@ namespace LFA_Lab1
             }
             return word.ToString();
         }
-
-
-        // public FiniteAutomaton toFiniteAutomaton()
-        // {
-        //     // ...
-        // }
     }
 }
