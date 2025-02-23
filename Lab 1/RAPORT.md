@@ -50,19 +50,94 @@ P={
 ```
 
 ## Implementation description
-* About 2-3 sentences to explain each piece of the implementation.
+* For the 1st step, I implemented a new class `Grammar`. It contains the HashSets for Terminal and Non-terminal symbols, a string as an initial symbol and a Dictionary for rules. I did not used constructor for this lab, and if it will be needed for next labs, I will implement it
 
+```cs
+    public class Grammar
+    {
+        public HashSet<char> V_N = new HashSet<char> {'S', 'A', 'B', 'C'};
+        public HashSet<char> V_T = new HashSet<char> {'a', 'b', 'c', 'd'};
+        public string S = "S";
+        public Dictionary<char,List<string>> P = new Dictionary<char, List<string>>
+        {
+            { 'S', new List<string> { "dA" } },
+            { 'A', new List<string> { "aB", "b" } },
+            { 'B', new List<string> { "bC", "d" } },
+            { 'C', new List<string> { "cB", "aA" } }
+        };
+    }
 ```
-public static void main() 
-{
 
+* The I added a `generateString()` method, for generation a random string using the grammar I have. Here is the most important condition for this method. It uses a rand class to choose randomly any next step from rules P.
+
+```cs
+if (P.ContainsKey(currentChar))
+{
+    List<string> productions = P[currentChar];
+    string chosenProduction = [rand.Next(productions.Count)];
+    word.Remove(i, 1);
+    word.Insert(i, chosenProduction);
+    replaced = true;
+    break;
 }
 ```
 
+* The next step was creating a `FiniteAutomaton` for converting a grammar object to finite automata object. It is very similar to `Grammar` class and the only difference is in the dictionary delta that uses a tuple. I also created a `ConvertFromGrammar` method in FA that uses pretty similar structure as `Grammar` class. Here is the constructor for FA:
+
+``` cs
+public FiniteAutomaton(HashSet<string> q, HashSet<char> sigma, Dictionary<(string, char), string> Delta, string Q0, HashSet<string> f)
+{
+    Q = q;
+    Sigma = sigma;
+    delta = Delta;
+    q0 = Q0;
+    F = f;
+}
+```
+
+* Here is the pivotal line in method `stringBelongsToLanguage()` in FA to change the current states
+
+```cs
+if (delta.ContainsKey((currentState, symbol))) { currentState = delta[(currentState, symbol)]; }
+```
+
+* The final step was a `Program` class to output the results of the laboratory work. Here I add to a HashSet 5 different strings and output them using `foreach` loop and then output the result: does input string belongs to language from my variant or not
+
+```cs
+while(set_of_5.Count<5) { set_of_5.Add(grammar.generateString()); }
+foreach(string s in set_of_5) { Console.WriteLine(s); }
+//
+Console.WriteLine($"Does {input} belong to language? " + fa.stringBelongToLanguage(input));
+
+```
+
+
 ## Results
+- Output 1:
+```powershell
+db
+dabaad
+dad
+dabab
+dabcbab
+Enter any string: 
+dabaabcd
+Does dabaabcd belong to language? True
+```
 
+- Output 2:
+```powershell
+db
+dad
+dabcd
+dabaabcd
+dabaabcbcd
+Enter any string:
+grammar
+Does grammar belong to language? False
+```
 ## Conclusions 
-
+In conclution I could add that it was interesting to get new skills and implement new techniques in this lab. I learned a lot about Grammars and Finite Automata until this day and I hope I will learn even more. I also learned how to work with HashSets and Dictionaries during this lab.
 ## References
 1. Cretu's GitHub Repository: https://github.com/filpatterson/DSL_laboratory_works/tree/master/1_RegularGrammars
 2. LFA ELSE Course: https://else.fcim.utm.md/course/view.php?id=98
