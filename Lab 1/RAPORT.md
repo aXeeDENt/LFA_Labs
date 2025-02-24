@@ -1,25 +1,9 @@
 # Intro to formal languages. Regular grammars. Finite Automata.
 
 ### Course: Formal Languages & Finite Automata
-### Author: Tatrintev Denis (FAF-232)
+### Author: Tatarintev Denis (FAF-232)
 
 ----
-
-## Theory
-**An alphabet** is a finite, nonempty set of symbols. By convention it is used the symbol ∑ for an alphabet. 
-
-**A language** is:
-    1. a set of strings from some alphabet (finite or infinite);
-    2. any subset L of Σ*
-
-**A grammar** G is an ordered quadruple G = ($V_N, V_T, P, S$)
-where:
-- $V_N$ - is a finite set of non-terminal symbols;
-- $V_T$ - is a finite set of terminal symbols;
-- S is a start symbol;
-- P – is a finite set of productions of rules.
-
-**Finite Automata** (**FA**) are like simple machines that follow a set of rules to process a sequence of inputs (like letters or numbers) and decide if they are valid or not.
 
 ## Objectives:
 1. Discover what a language is and what it needs to have in order to be considered a formal one;
@@ -49,8 +33,34 @@ P={
 }
 ```
 
+## Theory
+Automata theory is a study of abstract machine , automat and a theoretical way solve computational problem using this abstract machine .It is the theoretical computer science .The word automata plural of automaton comes from Greek word ...which means “self making”. Automata theory is closely related to formal language theory. A formal language consist of word whose latter are taken from an alphabet and are well formed according to specific set of rule . so we can say An automaton is a finite representation of a formal language that may be an infinite set. Automata are often classified by the class of formal languages they can recognize, typically illustrated by the CHOMSKY HIERARCHY which describes the relations between various languages and kinds of formalized logics.
+
+**An alphabet** is a finite, nonempty set of symbols. By convention it is used the symbol ∑ for an alphabet. 
+
+**A language** is:
+    1. a set of strings from some alphabet (finite or infinite);
+    2. any subset L of Σ*
+
+**A grammar** G is an ordered quadruple G = ($V_N, V_T, P, S$)
+where:
+- $V_N$ - is a finite set of non-terminal symbols;
+- $V_T$ - is a finite set of terminal symbols;
+- S is a start symbol;
+- P – is a finite set of productions of rules.
+
+**Finite Automata** (**FA**) are like simple machines that follow a set of rules to process a sequence of inputs (like letters or numbers) and decide if they are valid or not. Finite automata are abstract machines used to recognize patterns in input sequences, forming the basis for understanding regular languages in computer science. They consist of states, transitions, and input symbols, processing each symbol step-by-step. If the machine ends in an accepting state after processing the input, it is accepted; otherwise, it is rejected. Finite automata come in deterministic (DFA) and non-deterministic (NFA), both of which can recognize the same set of regular languages. They are widely used in text processing, compilers, and network protocols.
+
+**Types of Finite Automata**
+There are two types of finite automata:
+    - Deterministic Fintie Automata (DFA)
+Finite state machine (FSM) or Finite Automaton-: is a mathematical model of a machine ,which can only reach to finite number of states by transition after reading one symbol at a time .Finite automata are computing device that accept or recognize regular language (A formal language follows rules).It is used to model operation of many system encountered in practices.
+    - Non-Deterministic Finite Automata (NFA)
+It is know as nondeterministic because several choice exist for a particular state for transit to different state after consuming single input symbol. In simple one input symbol , more than one transition can reach to more than one state. It is not compulsory that all the state have to consume all symbol in ∑.
+
+
 ## Implementation description
-* For the 1st step, I implemented a new class `Grammar`. It contains the HashSets for Terminal and Non-terminal symbols, a string as an initial symbol and a Dictionary for rules. I did not used constructor for this lab, and if it will be needed for next labs, I will implement it
+* For the 1st step, I implemented a new class `Grammar`. It contains the HashSets for Terminal and Non-terminal symbols, a string as an initial symbol and a Dictionary for rules. I did not used constructor for this lab, and if it will be needed for next labs, I will implement it. Right now it has 2 hashsets from my variant `{'S', 'A', 'B', 'C'}` and `{'a', 'b', 'c', 'd'}`, a string `S` and a dictionary that works accorsing to the P vrom my variant
 
 ```cs
     public class Grammar
@@ -68,7 +78,7 @@ P={
     }
 ```
 
-* The I added a `generateString()` method, for generation a random string using the grammar I have. Here is the most important condition for this method. It uses a rand class to choose randomly any next step from rules P.
+* The I added a `generateString()` method, for generation a random string using the grammar I have. Here is the most important condition for this method. It uses a rand class to choose randomly any next step from rules P. So sum it up it creates a list productions for current char, using rand it chooses the random from the rules for each non-terminal, and replaces using `.Remove` -> `.Insert`
 
 ```cs
 if (P.ContainsKey(currentChar))
@@ -137,7 +147,8 @@ grammar
 Does grammar belong to language? False
 ```
 ## Conclusions 
-In conclution I could add that it was interesting to get new skills and implement new techniques in this lab. I learned a lot about Grammars and Finite Automata until this day and I hope I will learn even more. I also learned how to work with HashSets and Dictionaries during this lab.
+In conclusion, I could add that it was interesting to acquire new skills and implement new techniques throughout this lab. I learned a lot about Grammars and Finite Automata up to this point, and I hope to deepen my understanding even further as I continue exploring the topic. Additionally, working with HashSets and Dictionaries provided valuable experience in efficiently storing and managing data. This lab not only reinforced my theoretical knowledge but also helped me develop practical problem-solving skills, which will be useful in future projects. Overall, this experience has been both challenging and rewarding, and I look forward to applying these concepts in more advanced scenarios.  
+
 ## References
 1. Cretu's GitHub Repository: https://github.com/filpatterson/DSL_laboratory_works/tree/master/1_RegularGrammars
 2. LFA ELSE Course: https://else.fcim.utm.md/course/view.php?id=98
