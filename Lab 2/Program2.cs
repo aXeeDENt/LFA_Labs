@@ -1,8 +1,125 @@
 using System;
 using System.Collections.Generic;
 
-namespace LFA_Lab1
+namespace LFA_Lab2
 {
+    // Import the classes from Lab 1 but adjust them to work in Lab 2
+    public class Grammar
+    {
+        public HashSet<char> V_N = new HashSet<char> {'S', 'A', 'B', 'C'};
+        public HashSet<char> V_T = new HashSet<char> {'a', 'b', 'c', 'd'};
+        public string S = "S";
+        public Dictionary<char,List<string>> P = new Dictionary<char, List<string>>
+        {
+            { 'S', new List<string> { "dA" } },
+            { 'A', new List<string> { "aB", "b" } },
+            { 'B', new List<string> { "bC", "d" } },
+            { 'C', new List<string> { "cB", "aA" } }
+        };
+
+        public string generateString()
+        {  
+            Random rand = new Random();
+            System.Text.StringBuilder word = new System.Text.StringBuilder(S.ToString());
+            while (true)
+            {
+                bool replaced = false;
+                for (int i=0; i<word.Length; i++)
+                {
+                    char currentChar = word[i];
+                    if (P.ContainsKey(currentChar))
+                    {
+                        List<string> productions = P[currentChar];
+                        string chosenProduction = productions[rand.Next(productions.Count)];
+                        word.Remove(i, 1);
+                        word.Insert(i, chosenProduction);
+                        replaced = true;
+                        break;
+                    }
+                }
+                if (!replaced) break;
+            }
+            return word.ToString();
+        }
+        
+        // New method for Lab 2
+        public string ClassifyGrammar()
+        {
+            // Type 0: Unrestricted Grammar - Default
+            // Type 1: Context-Sensitive Grammar
+            // Type 2: Context-Free Grammar
+            // Type 3: Regular Grammar (Right or Left Linear)
+
+            bool isType3 = true;
+            bool isRightLinear = true;
+            bool isLeftLinear = true;
+            bool isType2 = true;
+            
+            foreach (var rule in P)
+            {
+                foreach (var production in rule.Value)
+                {
+                    // Check for Type 3 (Regular Grammar)
+                    // Right-linear: A → aB or A → a
+                    // Left-linear: A → Ba or A → a
+                    
+                    if (production.Length > 2)
+                    {
+                        isRightLinear = false;
+                        isLeftLinear = false;
+                    }
+                    else if (production.Length == 2)
+                    {
+                        // Check if the first symbol is terminal and second is non-terminal (Right-linear)
+                        bool firstIsTerminal = V_T.Contains(production[0]);
+                        bool secondIsNonTerminal = V_N.Contains(production[1]);
+                        
+                        if (!(firstIsTerminal && secondIsNonTerminal))
+                        {
+                            isRightLinear = false;
+                        }
+                        
+                        // Check if the first symbol is non-terminal and second is terminal (Left-linear)
+                        bool firstIsNonTerminal = V_N.Contains(production[0]);
+                        bool secondIsTerminal = V_T.Contains(production[1]);
+                        
+                        if (!(firstIsNonTerminal && secondIsTerminal))
+                        {
+                            isLeftLinear = false;
+                        }
+                    }
+                    
+                    // If neither right-linear nor left-linear, it's not Type 3
+                    if (!isRightLinear && !isLeftLinear)
+                    {
+                        isType3 = false;
+                    }
+                    
+                    // Check for Type 2 (Context-Free Grammar)
+                    // All productions must be of the form A → α where A is a single non-terminal
+                    // This is already satisfied by our grammar representation
+                }
+            }
+            
+            if (isType3)
+            {
+                if (isRightLinear)
+                    return "Type 3: Regular Grammar (Right-Linear)";
+                else if (isLeftLinear)
+                    return "Type 3: Regular Grammar (Left-Linear)";
+                else
+                    return "Type 3: Regular Grammar";
+            }
+            else if (isType2)
+            {
+                return "Type 2: Context-Free Grammar";
+            }
+            
+            // For now, we'll assume we don't have Type 0 or Type 1 grammars
+            return "Type 2: Context-Free Grammar";
+        }
+    }
+
     public class FiniteAutomaton
     {
         public HashSet<string> Q { get; private set; } 
@@ -61,7 +178,8 @@ namespace LFA_Lab1
             }
             return F.Contains(currentState); 
         }
-        // Addition to FiniteAutomaton.cs
+        
+        // New methods for Lab 2
         public Grammar ConvertToGrammar()
         {
             // Create a new Grammar instance
@@ -127,30 +245,42 @@ namespace LFA_Lab1
             return grammar;
         }
 
-        // Check if FA is deterministic
         public bool IsDeterministic()
         {
-            // A DFA has exactly one transition for each state and input symbol
-            HashSet<(string, char)> transitions = new HashSet<(string, char)>();
+            // First check: no state can have multiple transitions for the same input symbol
+            Dictionary<(string, char), int> transitionCount = new Dictionary<(string, char), int>();
             
             foreach (var transition in delta)
             {
-                if (transitions.Contains(transition.Key))
-                {
-                    return false;  // Found multiple transitions for the same state and input
-                }
+                (string state, char symbol) key = transition.Key;
                 
-                transitions.Add(transition.Key);
+                if (transitionCount.ContainsKey(key))
+                {
+                    transitionCount[key]++;
+                }
+                else
+                {
+                    transitionCount[key] = 1;
+                }
             }
             
-            // Check if all states have transitions for all input symbols
+            // If any state has multiple transitions for the same input, it's non-deterministic
+            foreach (var count in transitionCount)
+            {
+                if (count.Value > 1)
+                {
+                    return false;
+                }
+            }
+            
+            // Second check: all states must have transitions for all input symbols
             foreach (string state in Q)
             {
                 foreach (char symbol in Sigma)
                 {
-                    if (!transitions.Contains((state, symbol)))
+                    if (!delta.ContainsKey((state, symbol)))
                     {
-                        return false;  // Missing transition
+                        return false;
                     }
                 }
             }
@@ -158,7 +288,6 @@ namespace LFA_Lab1
             return true;
         }
 
-        // Convert NDFA to DFA
         public FiniteAutomaton ConvertToDFA()
         {
             if (IsDeterministic())
@@ -239,78 +368,7 @@ namespace LFA_Lab1
             
             return new FiniteAutomaton(newQ, Sigma, newDelta, initialState, newF);
         }
-
-        // Add to FiniteAutomaton.cs
-        public void RenderGraph(string outputPath = "automaton.png")
-        {
-            // This requires adding the ScottPlot NuGet package
-            var plt = new ScottPlot.Plot(600, 400);
-            
-            // Dictionary to assign coordinates to each state
-            Dictionary<string, (double x, double y)> stateCoordinates = new Dictionary<string, (double x, double y)>();
-            
-            // Arrange states in a circle
-            int stateCount = Q.Count;
-            double radius = 1.0;
-            double centerX = 0.0;
-            double centerY = 0.0;
-            
-            int i = 0;
-            foreach (string state in Q)
-            {
-                double angle = 2 * Math.PI * i / stateCount;
-                double x = centerX + radius * Math.Cos(angle);
-                double y = centerY + radius * Math.Sin(angle);
-                
-                stateCoordinates[state] = (x, y);
-                
-                // Add state circle
-                var circle = plt.AddCircle(x, y, 0.1);
-                
-                // Highlight initial and final states
-                // if (state == q0)
-                // {
-                //     circle.lineWidth = 2;
-                // }
-                
-                if (F.Contains(state))
-                {
-                    var innerCircle = plt.AddCircle(x, y, 0.08);
-                    // innerCircle.lineWidth = 2;
-                }
-                
-                // Add state label
-                plt.AddText(state, x, y, size: 12);
-                
-                i++;
-            }
-            
-            // Add transitions
-            foreach (var transition in delta)
-            {
-                string fromState = transition.Key.Item1;
-                char symbol = transition.Key.Item2;
-                string toState = transition.Value;
-                
-                (double x1, double y1) = stateCoordinates[fromState];
-                (double x2, double y2) = stateCoordinates[toState];
-                
-                // Draw arrow
-                plt.AddArrow(x1, y1, x2, y2, lineWidth: 1);
-                
-                // Add transition label (symbol)
-                double labelX = (x1 + x2) / 2;
-                double labelY = (y1 + y2) / 2;
-                plt.AddText(symbol.ToString(), labelX, labelY, size: 12);
-            }
-            
-            // Save the plot to a file
-            plt.SaveFig(outputPath);
-            Console.WriteLine($"Automaton graph saved to {outputPath}");
-        }
-
-        // Add to FiniteAutomaton.cs (replaces the ScottPlot version)
-        // Add to FiniteAutomaton.cs (replaces the ScottPlot version)
+        
         public string GenerateDotGraph()
         {
             // Create a DOT representation of the automaton
@@ -357,6 +415,74 @@ namespace LFA_Lab1
             System.IO.File.WriteAllText(filename, dotContent);
             Console.WriteLine($"DOT graph saved to {filename}");
             Console.WriteLine("You can visualize this using online tools like http://viz-js.com/ or Graphviz");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Lab 2: Finite Automata and Grammars");
+            
+            // Create a sample finite automaton
+            HashSet<string> states = new HashSet<string> { "q0", "q1", "q2", "q3" };
+            HashSet<char> alphabet = new HashSet<char> { 'a', 'b' };
+            Dictionary<(string, char), string> transitions = new Dictionary<(string, char), string>
+            {
+                [("q0", 'a')] = "q1",
+                [("q0", 'b')] = "q2",
+                [("q1", 'a')] = "q1",
+                [("q1", 'b')] = "q3",
+                [("q2", 'a')] = "q1",
+                [("q2", 'b')] = "q2",
+                [("q3", 'a')] = "q1",
+                [("q3", 'b')] = "q2"
+            };
+            string initialState = "q0";
+            HashSet<string> finalStates = new HashSet<string> { "q3" };
+            
+            FiniteAutomaton fa = new FiniteAutomaton(states, alphabet, transitions, initialState, finalStates);
+            
+            // Test if the FA is deterministic
+            Console.WriteLine("Is the FA deterministic? " + fa.IsDeterministic());
+            
+            // Convert FA to regular grammar
+            Grammar grammar = fa.ConvertToGrammar();
+            
+            // Print the grammar
+            Console.WriteLine("\nRegular Grammar derived from FA:");
+            Console.WriteLine("Non-terminals: " + string.Join(", ", grammar.V_N));
+            Console.WriteLine("Terminals: " + string.Join(", ", grammar.V_T));
+            Console.WriteLine("Start symbol: " + grammar.S);
+            Console.WriteLine("Productions:");
+            foreach (var production in grammar.P)
+            {
+                Console.WriteLine($"{production.Key} -> {string.Join(" | ", production.Value)}");
+            }
+            
+            // Classify the grammar
+            Console.WriteLine("\nGrammar Classification: " + grammar.ClassifyGrammar());
+            
+            // Convert NDFA to DFA if necessary
+            if (!fa.IsDeterministic())
+            {
+                Console.WriteLine("\nConverting NDFA to DFA...");
+                FiniteAutomaton dfa = fa.ConvertToDFA();
+                Console.WriteLine("DFA has " + dfa.Q.Count + " states");
+                
+                // Save the DFA as a DOT file
+                dfa.SaveDotToFile("dfa.dot");
+            }
+            else
+            {
+                // Save the FA as a DOT file
+                fa.SaveDotToFile("fa.dot");
+            }
+            
+            // Test string recognition
+            Console.WriteLine("\nEnter a string to test:");
+            string input = Console.ReadLine();
+            Console.WriteLine("String belongs to language: " + fa.stringBelongToLanguage(input));
         }
     }
 }

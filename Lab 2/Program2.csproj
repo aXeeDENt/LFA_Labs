@@ -8,4 +8,7 @@
 <ItemGroup>
   <PackageReference Include="ScottPlot" Version="4.1.67" />
 </ItemGroup>
+<ItemGroup>
+  <ProjectReference Include="..\Lab 1\Implementation\Program.csproj" />
+</ItemGroup>
 </Project>
