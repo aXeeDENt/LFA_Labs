@@ -122,6 +122,39 @@ switch (chomskyType)
 ```
 * **Finite Automata** (**FA**) are like simple machines that follow a set of rules to process a sequence of inputs (like letters or numbers) and decide if they are valid or not. 
 
+![alt text](image.png)
+
+Here is presented the Whole Task 3 implementation. 
+First Step was converting the FA to Regular Grammar. 
+
+**Algorithm Description**
+1. $V_N=Q$
+2. $V_T=Σ$
+3. $S=q_0$
+4. For production P:
+- a)P = ∅; 
+- b) For all values $δ(q, a) = (q1, q2,…, q_m)$ we have: P = P ∪ {$q → aq_i | i=1,m$} 
+- c) For all values $δ(q, a) = (q1, q2,…, q_m)$, if F ∩ {$q1, q2,…, q_m$} is not ∅ we have P = P ∪ {$q → a$}
+
+Next step was saying if FA is either eterministic or non-deterministic. Since it has the situation when after state $q_0$ after getting $a$ can get both to states $q_0$ and $q_1$ it is NFA (Non-Deterministic).
+
+Now I have to convert the NFA to DFA and to draw a graphical representation
+
+**1st Algorithm of conversion NFA to DFA (analytical conversion)**
+
+1. Initialize the initial state $q_0$ and this state add to the Q’: $Q'=∅;[q_0]'=q_0;Q'=${$[q_0]$}
+2. Determinate the transition function by the following rule: $δ(${$q_0,q_1,q_2,...,q_n$}$,a)=∪$ from i=1 to n δ($q_1$,a)
+3. For all states from $q_0,q_1,q_2,...,q_n$ is from Q', present $δ(${$q_0,q_1,q_2,...,q_n$}$,a)=${$p_0,p_1,p_2,...,p_n$} are from Σ. If {$p_0,p_1,p_2,...,p_n$} is not from Q', then it is included to the Q' and it is defined the transition function δ
+4. Repeat the $3^r$$^d$ step until occur the changes in Q'
+5. Define the set of final states as F'=({$q_0,q_1,q_2,...,q_n|q_i, 1<=i<=n,q_i$ is from F})
+
+**2nd Algorithm of conversion NFA to DFA (table conversion)**
+1. Create the state table for the given NFA
+2. Create a blank state table under possible input alphabets for the equivalent DFA
+3. Mark the start state of the DFA by $q_0$ (same as the NFA)
+4. Find out the combination of states {$q_0,q_1,...,q_n$} for each possible input alphabet
+5. Each time it is generated the new DFA state under the input alphabet columns, it should be applied the step 4 again, otherwise go to step 6.
+6. The states which contain any of the final states of the NFA are the final states of the equivalent DFA.
 
 ## Results
 - Output 1:
