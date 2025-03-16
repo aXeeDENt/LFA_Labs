@@ -6,32 +6,55 @@
 ----
 
 ## Theory
-**An alphabet** is a finite, nonempty set of symbols. By convention it is used the symbol ∑ for an alphabet. 
+### Chomsky Classification
+**Type 0. Recursively Enumerable Grammar** no restrictions on productions  for example: $alpha->beta$
 
-**A language** is:
-    1. a set of strings from some alphabet (finite or infinite);
-    2. any subset L of Σ*
+**Type 1. Context-Sensitive Grammars** all production are in the form $a_1Aa_2->a_1Beta_2$ where $a_1,a_2$ is $(V_nUV_t)^*, Bet$ is $(V_NUV_T)^+, A$ is $V_N$ 
+- left-context-sensitive grammar $a_1A->a_1Bet$
+- right-context-sensitive grammar $Aa_2->Beta_2$
 
-**A grammar** G is an ordered quadruple G = ($V_N, V_T, P, S$)
-where:
-- $V_N$ - is a finite set of non-terminal symbols;
-- $V_T$ - is a finite set of terminal symbols;
-- S is a start symbol;
-- P – is a finite set of productions of rules.
+**Type 2. Context-Free Grammar** the all productions of grammar G must be in form $A->Bet,$ where $A$ is $V_N,Bet$ is $(V_nUV_t)^*$
 
-**Finite Automata** (**FA**) are like simple machines that follow a set of rules to process a sequence of inputs (like letters or numbers) and decide if they are valid or not.
+**Type 3. Regular Grammar** is most restricted grammar and it has two representations as
+1. Right Linear Grammar: $A->aB, A->a$ where $a$ is $V_T, A,B$ is $V_N$
+2. Left Linear Grammar: $A->bA, A->a$ where $a$ is $V_T, A,B$ is $V_N$
+
+### Finite Automata
+#### **Deterministic Finite Automaton**
+A deterministic finite automaton is a 5-tuple ($Q, Σ, σ, q_0, F$)
+- $Q$ is a finite set of states
+- Σ is an input alphabet
+- δ: $Q$ X $Σ -> Q$ is a transition function
+- $q_0$ is from $Q$ and is the initial state
+- $F$ is a subset from $Q$ and is a set of accepting states (of final states)
+#### **E-Nondeterministic Finite Automaton (ε–NFA)**
+A nondeterministic finite automaton is a 5-tuple ($Q, Σ, σ, q_0, F$)
+- $Q$ is a finite set of states
+- Σ is an input alphabet
+- δ: $Q$ X ($Σ$ U {$ε$})$->$ subsets of $Q$ is a transition function; 
+	can go into several states;
+	it is allowed the ε-transitions
+- $q_0$ is from $Q$ and is the initial state
+- $F$ is a subset from $Q$ and is a set of accepting states (of final states)
 
 ## Objectives:
-1. Discover what a language is and what it needs to have in order to be considered a formal one;
-2. Provide the initial setup for the evolving project that you will work on during this semester. You can deal with each laboratory work as a separate task or project to demonstrate your understanding of the given themes, but you also can deal with labs as stages of making your own big solution, your own project. Do the following:
-    -  Create GitHub repository to deal with storing and updating your project;
-    - Choose a programming language. Pick one that will be easiest for dealing with your tasks, you need to learn how to solve the problem itself, not everything around the problem (like setting up the project, launching it correctly and etc.);
-    - Store reports separately in a way to make verification of your work simpler (duh)
-3. According to your variant number, get the grammar definition and do the following:
-    - Implement a type/class for your grammar;
-    - Add one function that would generate 5 valid strings from the language expressed by your given grammar;
-    - Implement some functionality that would convert and object of type Grammar to one of type Finite Automaton;
-    - For the Finite Automaton, please add a method that checks if an input string can be obtained via the state transition from it;
+1. Understand what an automaton is and what it can be used for.
+2. Continuing the work in the same repository and the same project, the following need to be added: 
+a. Provide a function in your grammar type/class that could classify the grammar based on Chomsky hierarchy.
+b. For this you can use the variant from the previous lab.
+3. According to your variant number (by universal convention it is register ID), get the finite automaton definition and do the following tasks:
+
+a. Implement conversion of a finite automaton to a regular grammar.
+
+b. Determine whether your FA is deterministic or non-deterministic.
+
+c. Implement some functionality that would convert an NDFA to a DFA.
+
+d. Represent the finite automaton graphically (Optional, and can be considered as a bonus point):
+- You can use external libraries, tools or APIs to generate the figures/diagrams.
+- Your program needs to gather and send the data about the automaton and the lib/tool/API return the visual representation.
+
+Please consider that all elements of the task 3 can be done manually, writing a detailed report about how you've done the conversion and what changes have you introduced. In case if you'll be able to write a complete program that will take some finite automata and then convert it to the regular grammar - this will be a good bonus point.
 
 ## My variant
 ``` 
@@ -48,94 +71,79 @@ F = {q3},
 ```
 
 ## Implementation description
-* For the 1st step, I implemented a new class `Grammar`. It contains the HashSets for Terminal and Non-terminal symbols, a string as an initial symbol and a Dictionary for rules. I did not used constructor for this lab, and if it will be needed for next labs, I will implement it
+* Here is presented the Code part from `Grammar.cs` Where is checked what Chomsky Type is the grammar from previous lab. The `IsType` functions will be described down below. It just checks and returns the number of the type of grammar that was already verified
 
 ```cs
-    public class Grammar
+public int GetChomskyType()
+{
+    if (IsType3()) return 3;
+    if (IsType2()) return 2;
+    if (IsType1()) return 1;
+    return 0;
+}
+```
+
+* I created the 3 `IsType` functions to verify Chomsky Type 3, chomsky Type 2 and Chomsky Type 1. The Type 0 is obviously the any left grammar that won't fit perfectly in those 3 previous types. Here is presented the Type 2 verification. 
+
+```cs
+private bool IsType2()
     {
-        public HashSet<char> V_N = new HashSet<char> {'S', 'A', 'B', 'C'};
-        public HashSet<char> V_T = new HashSet<char> {'a', 'b', 'c', 'd'};
-        public string S = "S";
-        public Dictionary<char,List<string>> P = new Dictionary<char, List<string>>
+        // Context-Free Grammar: All productions are of the form A → α where α is any string of terminals and non-terminals
+        foreach (var rule in P)
         {
-            { 'S', new List<string> { "dA" } },
-            { 'A', new List<string> { "aB", "b" } },
-            { 'B', new List<string> { "bC", "d" } },
-            { 'C', new List<string> { "cB", "aA" } }
-        };
+            char nonTerminal = rule.Key;
+            if (!V_N.Contains(nonTerminal)) return false;
+        }
+        return true;
     }
 ```
 
-* The I added a `generateString()` method, for generation a random string using the grammar I have. Here is the most important condition for this method. It uses a rand class to choose randomly any next step from rules P.
+* For the Type 2 I used the simple description from the provoded book. It says that: Context-Free Grammar is the grammar where all productions are of the form A → α where α is any string of terminals and non-terminals. that means that we do not pay attention to the right side and just make sure that left side do not contain non-terminals like `a`, `b` or `c` for example.
+
+* The final step was a `Program2.cs` class to output the results of the 2nd laboratory work. Here I just created a new `Grammar` type object and used `GetChomskyType()` and `GetChomskyTypeDescription()` methods to get the reult and then just printed the result.
 
 ```cs
-if (P.ContainsKey(currentChar))
+switch (chomskyType)
 {
-    List<string> productions = P[currentChar];
-    string chosenProduction = [rand.Next(productions.Count)];
-    word.Remove(i, 1);
-    word.Insert(i, chosenProduction);
-    replaced = true;
-    break;
+    case 3:
+        Console.WriteLine("This is a Regular Grammar");
+        break;
+    case 2:
+        Console.WriteLine("This is a Context-Free Grammar");
+        break;
+    case 1:
+        Console.WriteLine("This is a Context-Sensitive Grammar");
+        break;
+    case 0:
+        Console.WriteLine("This is an Unrestricted Grammar");
+        break;
 }
-```
-
-* The next step was creating a `FiniteAutomaton` for converting a grammar object to finite automata object. It is very similar to `Grammar` class and the only difference is in the dictionary delta that uses a tuple. I also created a `ConvertFromGrammar` method in FA that uses pretty similar structure as `Grammar` class. Here is the constructor for FA:
-
-``` cs
-public FiniteAutomaton(HashSet<string> q, HashSet<char> sigma, Dictionary<(string, char), string> Delta, string Q0, HashSet<string> f)
-{
-    Q = q;
-    Sigma = sigma;
-    delta = Delta;
-    q0 = Q0;
-    F = f;
-}
-```
-
-* Here is the pivotal line in method `stringBelongsToLanguage()` in FA to change the current states
-
-```cs
-if (delta.ContainsKey((currentState, symbol))) { currentState = delta[(currentState, symbol)]; }
-```
-
-* The final step was a `Program` class to output the results of the laboratory work. Here I add to a HashSet 5 different strings and output them using `foreach` loop and then output the result: does input string belongs to language from my variant or not
-
-```cs
-while(set_of_5.Count<5) { set_of_5.Add(grammar.generateString()); }
-foreach(string s in set_of_5) { Console.WriteLine(s); }
-//
-Console.WriteLine($"Does {input} belong to language? " + fa.stringBelongToLanguage(input));
 
 ```
+* **Finite Automata** (**FA**) are like simple machines that follow a set of rules to process a sequence of inputs (like letters or numbers) and decide if they are valid or not. 
 
 
 ## Results
 - Output 1:
 ```powershell
-db
-dabaad
-dad
-dabab
-dabcbab
-Enter any string: 
-dabaabcd
-Does dabaabcd belong to language? True
+Chomsky Type -> Type 3: Regular Grammar
+This is a Regular Grammar
 ```
 
-- Output 2:
-```powershell
-db
-dad
-dabcd
-dabaabcd
-dabaabcbcd
-Enter any string:
-grammar
-Does grammar belong to language? False
-```
 ## Conclusions 
-In conclution I could add that it was interesting to get new skills and implement new techniques in this lab. I learned a lot about Grammars and Finite Automata until this day and I hope I will learn even more. I also learned how to work with HashSets and Dictionaries during this lab.
+Here's a conclusion for your lab work covering the two tasks:
+
+## Conclusion
+This laboratory work focused on implementing and analyzing core concepts from formal language theory, specifically grammars and finite automata.
+In the 2nd task, I successfully implemented functionality to determine the Chomsky Type of a grammar. By examining the structure of production rules, my program can accurately classify grammars into Type 0 (Unrestricted), Type 1 (Context-Sensitive), Type 2 (Context-Free), or Type 3 (Regular).
+
+The 3d task outlined for future implementation involves deeper exploration of finite automata, including:
+- Converting finite automata back to regular grammars
+- Determining whether an automaton is deterministic or non-deterministic
+- Implementing conversion from NDFA to DFA
+- Optional graphical representation of automata
+
+These implementations will complete the bidirectional conversion between grammars and automata, demonstrate the equivalence of NFAs and DFAs, and provide visual representations to enhance understanding. Through this lab work, I've gained practical experience with formal language concepts, understanding the theoretical hierarchy of grammars and their relationship to different types of automata. These implementations provide a foundation for analyzing and manipulating formal languages computationally.
 ## References
 1. Cretu's GitHub Repository: https://github.com/filpatterson/DSL_laboratory_works/tree/master/1_RegularGrammars
 2. LFA ELSE Course: https://else.fcim.utm.md/course/view.php?id=98

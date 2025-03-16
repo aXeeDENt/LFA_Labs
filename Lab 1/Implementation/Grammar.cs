@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace LFA_Lab1
 {
@@ -17,7 +18,6 @@ namespace LFA_Lab1
             { 'C', new List<string> { "cB", "aA" } }
         };
         // public Grammar(HashSet<char> v_N, HashSet<char> v_T, char s, Dictionary<char,List<string>> p) { this.S = s; this.V_N = v_N; this.V_T = v_T; this.P = p; }
-
         public string generateString()
         {  
             Random rand = new Random();
@@ -42,82 +42,65 @@ namespace LFA_Lab1
             }
             return word.ToString();
         }
-
-        // Addition to Grammar.cs
-        public string ClassifyGrammar()
+        public int GetChomskyType()
         {
-            // Type 0: Unrestricted Grammar - Default
-            // Type 1: Context-Sensitive Grammar
-            // Type 2: Context-Free Grammar
-            // Type 3: Regular Grammar (Right or Left Linear)
-
-            bool isType3 = true;
-            bool isRightLinear = true;
-            bool isLeftLinear = true;
-            bool isType2 = true;
-            
+            if (IsType3()) return 3;
+            if (IsType2()) return 2;
+            if (IsType1()) return 1;
+            return 0;
+        }
+        private bool IsType3()
+        {
+            // Regular Grammar: All productions are of the form A → a or A → aB
             foreach (var rule in P)
             {
                 foreach (var production in rule.Value)
                 {
-                    // Check for Type 3 (Regular Grammar)
-                    // Right-linear: A → aB or A → a
-                    // Left-linear: A → Ba or A → a
-                    
-                    if (production.Length > 2)
-                    {
-                        isRightLinear = false;
-                        isLeftLinear = false;
-                    }
-                    else if (production.Length == 2)
-                    {
-                        // Check if the first symbol is terminal and second is non-terminal (Right-linear)
-                        bool firstIsTerminal = V_T.Contains(production[0]);
-                        bool secondIsNonTerminal = V_N.Contains(production[1]);
-                        
-                        if (!(firstIsTerminal && secondIsNonTerminal))
-                        {
-                            isRightLinear = false;
-                        }
-                        
-                        // Check if the first symbol is non-terminal and second is terminal (Left-linear)
-                        bool firstIsNonTerminal = V_N.Contains(production[0]);
-                        bool secondIsTerminal = V_T.Contains(production[1]);
-                        
-                        if (!(firstIsNonTerminal && secondIsTerminal))
-                        {
-                            isLeftLinear = false;
-                        }
-                    }
-                    
-                    // If neither right-linear nor left-linear, it's not Type 3
-                    if (!isRightLinear && !isLeftLinear)
-                    {
-                        isType3 = false;
-                    }
-                    
-                    // Check for Type 2 (Context-Free Grammar)
-                    // All productions must be of the form A → α where A is a single non-terminal
-                    // This is already satisfied by our grammar representation
+                    bool singleTerminal = production.Length == 1 && V_T.Contains(production[0]);
+                    bool terminalNonTerminal = production.Length == 2 && V_T.Contains(production[0]) && V_N.Contains(production[1]);
+                    if (!(singleTerminal || terminalNonTerminal)) return false;
                 }
             }
-            
-            if (isType3)
+            return true;
+        }
+        private bool IsType2()
+        {
+            // Context-Free Grammar: All productions are of the form A → α where α is any string of terminals and non-terminals
+            foreach (var rule in P)
             {
-                if (isRightLinear)
-                    return "Type 3: Regular Grammar (Right-Linear)";
-                else if (isLeftLinear)
-                    return "Type 3: Regular Grammar (Left-Linear)";
-                else
-                    return "Type 3: Regular Grammar";
+                char nonTerminal = rule.Key;
+                if (!V_N.Contains(nonTerminal)) return false;
             }
-            else if (isType2)
+            return true;
+        }
+        private bool IsType1()
+        {
+            // Context-Sensitive Grammar: All productions are of the form αAβ → αγβ where γ is not empty
+            foreach (var rule in P)
             {
-                return "Type 2: Context-Free Grammar";
+                foreach (var production in rule.Value)
+                {
+                    if (production.Length == 0 && rule.Key == S[0])
+                    {
+                        // Check if S appears on the right side of any production
+                        foreach (var r in P) { foreach (var p in r.Value) { if (p.Contains(S[0])) return false; } }
+                    }
+                    if (production.Length == 0) return false;
+                }
             }
-            
-            // For now, we'll assume we don't have Type 0 or Type 1 grammars
-            return "Type 2: Context-Free Grammar";
+            return true;
+        }
+
+        public string GetChomskyTypeDescription()
+        {
+            int type = GetChomskyType();
+            return type switch
+            {
+                0 => "Type 0: Unrestricted Grammar",
+                1 => "Type 1: Context-Sensitive Grammar",
+                2 => "Type 2: Context-Free Grammar",
+                3 => "Type 3: Regular Grammar"
+            };
         }
     }
 }
