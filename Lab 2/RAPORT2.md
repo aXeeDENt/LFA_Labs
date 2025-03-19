@@ -163,9 +163,6 @@ Chomsky Type -> Type 3: Regular Grammar
 This is a Regular Grammar
 ```
 
-## Conclusions 
-Here's a conclusion for your lab work covering the two tasks:
-
 ## Conclusion
 This laboratory work focused on implementing and analyzing core concepts from formal language theory, specifically grammars and finite automata.
 In the 2nd task, I successfully implemented functionality to determine the Chomsky Type of a grammar. By examining the structure of production rules, my program can accurately classify grammars into Type 0 (Unrestricted), Type 1 (Context-Sensitive), Type 2 (Context-Free), or Type 3 (Regular).
