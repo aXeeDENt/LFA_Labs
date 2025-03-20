@@ -1,0 +1,7 @@
+character {
+    name "John"
+    LVL 19
+    EXP 375
+    race "Human"
+    role "Warrior"
+}

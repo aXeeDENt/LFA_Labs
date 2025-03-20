@@ -1,0 +1,106 @@
+        Character,
+        Stats,
+        Inventory,
+        Quest,
+        Dialogue,
+        // ? (if, else, print) ?
+        
+
+        // identifiers (character, stats, inventory)
+        name,
+        experience
+        race,
+        role,
+        secondrole,
+
+        // level,
+        // intelligence,
+        // strength,
+        // agility,
+        // magictype,
+        // health,
+        // physicaldamage,
+        // magicaldamage,
+
+        // add inventory, quests, dialogues
+
+        item,
+
+        // Literals
+        stringliteral,
+        numberliteral,
+        booleanliteral,
+        
+        // Symbols
+        leftbrace,
+        rightbrace,
+        leftbracket,
+        rightbracket,
+        colon,
+
+        // Operators
+        plus,
+        minus,
+        multiply,
+        divide,
+        equal,
+
+        // Special Tokens
+        EndOfFile
+
+        // Functions
+        to_heal,
+        to_upgrade_level,
+        to_upgrade_intelligence,
+        to_upgrade_strength,
+        to_upgrade_agility,
+        leftparen,
+        rightparen,
+        comma,
+
+        // Comments
+        comment
+
+
+
+Character {
+    name "Johnson Skye"
+    race "Human"
+    role "Warrior"
+    secondrole "Berserk"
+    Stats {
+        level 19
+        experience 37.36
+        health 376.5
+        intelligence 5.3
+        strength 22.9
+        agility 7.1
+        magictype "none"
+    }
+    Inventory {
+        Axe [
+            type "weapon"  
+            level_needed 15
+            intelligence_needed 5 
+            strength_needed 17 
+            agility_needed 6
+            physical_damage 56.3 
+            magical_damage 11.2
+        ] 
+        Water [
+            type "quest_item"
+        ]
+    }
+    Quests_obtained {
+        "Dragon Killer"
+        "Demon Hunter"
+        "Help Me!"
+    }
+    Dialoogue_lines {
+        Hello_line "Greetings!"
+        Goodbye_line "Farewell!"
+        Giving_quest "I have a task for you"
+        Getting_quest "I'll do my best"
+        Rejecting_quest "I can't do this"
+    }
+}
