@@ -1,0 +1,29 @@
+tok_Dialogue, Dialogue, Line: 1, Column 1
+tok_left_brace, {, Line: 1, Column 10
+tok_character_lines, characterLines, Line: 2, Column 5
+tok_str, John, Line: 2, Column 22
+tok_left_brace, {, Line: 3, Column 5
+tok_hello_line, helloLine, Line: 4, Column 9
+tok_str, Greetings, Line: 4, Column 21
+tok_quest_accepted, questAccepted, Line: 5, Column 9
+tok_str, I will do that for ya, pal!, Line: 5, Column 25
+tok_quest_declined, questDeclined, Line: 6, Column 9
+tok_str, I can't do that, Line: 6, Column 25
+tok_goodbye_line, goodbyeLine, Line: 7, Column 9
+tok_str, Farewell, Line: 7, Column 23
+tok_right_brace, }, Line: 8, Column 5
+tok_character_lines, characterLines, Line: 9, Column 5
+tok_str, Young Lady, Line: 9, Column 22
+tok_left_brace, {, Line: 10, Column 5
+tok_hello_line, helloLine, Line: 11, Column 9
+tok_str, Happy to see you again, Line: 11, Column 21
+tok_quest_to_accept, questToAccept, Line: 12, Column 9
+tok_str, I want you to help me, Line: 12, Column 25
+tok_after_quest_accepted, afterQuestAccepted, Line: 13, Column 9
+tok_str, I'm so happy!, Line: 13, Column 30
+tok_after_quest_declined, afterQuestDeclined, Line: 14, Column 9
+tok_str, Such a pity, Line: 14, Column 30
+tok_goodbye_line, goodbyeLine, Line: 15, Column 9
+tok_str, Have a good day, Line: 15, Column 23
+tok_right_brace, }, Line: 16, Column 5
+tok_right_brace, }, Line: 17, Column 1

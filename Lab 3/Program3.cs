@@ -26,11 +26,13 @@ namespace Lab3
             }
             string input = File.ReadAllText(filepath);
             Lexer lexer = new Lexer(input);
+            File.WriteAllText("Samples\\output.txt", string.Empty);
             while (lexer.Has_Next_Token())
             {
                 Token token = lexer.Next_Token();
-                Console.WriteLine(token);
+                File.AppendAllText("Samples\\output.txt", token.ToString() + '\n');
             }
+            Console.WriteLine("The tokenisation is shown in output.txt");
         }
     }
 }

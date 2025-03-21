@@ -1,1 +1,53 @@
-character
+character {
+    name "John"
+    LVL 19
+    EXP 375
+    INT 7
+    STR 23
+    AGI 9
+    HP 1024
+    Gold 137
+    magicType "None"
+    
+    race "Human"
+    role "Warrior" > secondRole "Berserk"
+    inventory {
+        [ type "Weapon" > item "Axe" > name "The Head Crusher", damageType "Physical", status "On" ]
+        [ type "Healing" > item "Potion" > name "The Great Green-Flower Mixture", heal 750, status "Off"]
+        [ type "Armor" > item "Light Armor" > name "The Dragon Eye Armor", protectionType "Magical", status "On"]
+        }
+}
+
+Quest {
+    name "Village Savior"
+    description "Far away from our Kingdom is located a village named OIIA. Dear warrior, guild wants you to get there and to settle up the situation with Goblins!"
+    briefly "Kill the Goblins in OIIA village"
+    reward {
+        Gold 341
+        STR | INT | AGI + 2
+        item "Potion" > name "LVL UP"
+        quest {
+            name "Lonely Lady"
+            status "Available"
+        }
+    }
+    status "Available and Accepted"
+}
+
+Dialogue {
+    characterLines "John"
+    {
+        helloLine "Greetings"
+        questAccepted "I will do that for ya, pal!"
+        questDeclined "I can't do that"
+        goodbyeLine "Farewell"   
+    }
+    characterLines "Young Lady"
+    {
+        helloLine "Happy to see you again"
+        questToAccept "I want you to help me"
+        afterQuestAccepted "I'm so happy!"
+        afterQuestDeclined "Such a pity"
+        goodbyeLine "Have a good day"
+    }
+}

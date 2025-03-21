@@ -1,1 +1,17 @@
-character
+Dialogue {
+    characterLines "John"
+    {
+        helloLine "Greetings"
+        questAccepted "I will do that for ya, pal!"
+        questDeclined "I can't do that"
+        goodbyeLine "Farewell"   
+    }
+    characterLines "Young Lady"
+    {
+        helloLine "Happy to see you again"
+        questToAccept "I want you to help me"
+        afterQuestAccepted "I'm so happy!"
+        afterQuestDeclined "Such a pity"
+        goodbyeLine "Have a good day"
+    }
+}

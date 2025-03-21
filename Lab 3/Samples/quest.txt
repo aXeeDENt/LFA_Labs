@@ -1,1 +1,15 @@
-character
+Quest {
+    name "Village Savior"
+    description "Far away from our Kingdom is located a village named OIIA. Dear warrior, guild wants you to get there and to settle up the situation with Goblins!"
+    briefly "Kill the Goblins in OIIA village"
+    reward {
+        Gold 341
+        STR | INT | AGI + 2
+        item "Potion" > name "LVL UP"
+        quest {
+            name "Lonely Lady"
+            status "Available"
+        }
+    }
+    status "Available and Accepted"
+}

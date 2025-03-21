@@ -2,6 +2,18 @@ character {
     name "John"
     LVL 19
     EXP 375
+    INT 7
+    STR 23
+    AGI 9
+    HP 1024
+    Gold 137
+    magicType "None"
+    
     race "Human"
-    role "Warrior"
+    role "Warrior" > secondRole "Berserk"
+    inventory {
+        [ type "Weapon" > item "Axe" > name "The Head Crusher", damageType "Physical", status "On" ]
+        [ type "Healing" > item "Potion" > name "The Great Green-Flower Mixture", heal 750, status "Off"]
+        [ type "Armor" > item "Light Armor" > name "The Dragon Eye Armor", protectionType "Magical", status "On"]
+        }
 }

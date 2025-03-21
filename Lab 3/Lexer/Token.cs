@@ -8,17 +8,17 @@ namespace LFA_Lab3.Lexer
         public TokenType Type { get; }
         public string Value { get; }
         public int Line { get; }
-        public int Position { get; }
+        public int Column { get; }
 
-        public Token(TokenType type, string value, int line = 0, int position = 0)
+        public Token(TokenType type, string value, int line = 0, int column = 0)
         {
             Type = type;
             Value = value;
             Line = line;
-            Position = position;
+            Column = column;
         }
 
         public override string ToString()
-        { return $"Token({Type}, {Value}, Line: {Line}, Position {Position})";}
+        { return $"{Type}, {Value}, Line: {Line}, Column {Column}";}
     }
 }
