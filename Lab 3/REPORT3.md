@@ -25,108 +25,113 @@ returned by the lexer includes a token code and potentially some metadata (e.g. 
 > Note: Just because too many students were showing me the same idea of lexer for a calculator, I've decided to specify requirements for such case. Try to make it at least a little more complex. Like, being able to pass integers and floats, also to be able to perform trigonometric operations (cos and sin). But it does not mean that you need to do the calculator, you can pick anything interesting you want
 
 ## Implementation description
-* Here is presented the Code part from `Grammar.cs` Where is checked what Chomsky Type is the grammar from previous lab. The `IsType` functions will be described down below. It just checks and returns the number of the type of grammar that was already verified
+* Here is presented the Code part from `TokenType.cs`, an enum, where are located all tokens that could be used for Lexer. Here are 4 Keywords, 11 identifiers for `Character` Keyword, 8 identifiers for `Dialogue` Keyword, 6 identifiers for `Inventory` Keyword, 4 identifiers for `Quest` keyword, 2 literals, 9 for symbols and 2 special words (46 overall). Each of them show the specific parameter in Lexer.
 
 ```cs
-public int GetChomskyType()
-{
-    if (IsType3()) return 3;
-    if (IsType2()) return 2;
-    if (IsType1()) return 1;
-    return 0;
-}
-```
-
-* I created the 3 `IsType` functions to verify Chomsky Type 3, chomsky Type 2 and Chomsky Type 1. The Type 0 is obviously the any left grammar that won't fit perfectly in those 3 previous types. Here is presented the Type 2 verification. 
-
-```cs
-private bool IsType2()
+public enum TokenType
     {
-        // Context-Free Grammar: All productions are of the form A → α where α is any string of terminals and non-terminals
-        foreach (var rule in P)
-        {
-            char nonTerminal = rule.Key;
-            if (!V_N.Contains(nonTerminal)) return false;
-        }
-        return true;
+        // Keywords
+        tok_Character, tok_Inventory, tok_Quest, tok_Dialogue,
+        ...
     }
 ```
 
-* For the Type 2 I used the simple description from the provoded book. It says that: Context-Free Grammar is the grammar where all productions are of the form A → α where α is any string of terminals and non-terminals. that means that we do not pay attention to the right side and just make sure that left side do not contain non-terminals like `a`, `b` or `c` for example.
-
-* The final step was a `Program2.cs` class to output the results of the 2nd laboratory work. Here I just created a new `Grammar` type object and used `GetChomskyType()` and `GetChomskyTypeDescription()` methods to get the reult and then just printed the result.
+* I created the `Token` class to get the tokens and added there 4 parameters, tokentype from the enum I described above, value that the token has exactly, lu=ine and column that outline the position of the token. here are presented the constructor of this class. It also has a ToString() overriden method.  
 
 ```cs
-switch (chomskyType)
+public Token(TokenType type, string value, int line = 0, int column = 0)
 {
-    case 3:
-        Console.WriteLine("This is a Regular Grammar");
-        break;
-    case 2:
-        Console.WriteLine("This is a Context-Free Grammar");
-        break;
-    case 1:
-        Console.WriteLine("This is a Context-Sensitive Grammar");
-        break;
-    case 0:
-        Console.WriteLine("This is an Unrestricted Grammar");
-        break;
+    Type = type;
+    Value = value;
+    Line = line;
+    Column = column;
 }
-
 ```
-* **Finite Automata** (**FA**) are like simple machines that follow a set of rules to process a sequence of inputs (like letters or numbers) and decide if they are valid or not. 
 
-Here is presented the Whole Task 3 implementation. 
-First Step was converting the FA to Regular Grammar. 
+* Next Step was creating the most important `Lexer.cs` class. Here I outlined all cases that can be met in input. Keywords that can be started both with lower and uppercase, identifiers, symbols, strings and numbers. I also added methods that ignore the whitespaces and then verify the next token exists or not.
 
-**Algorithm Description**
-1. $V_N=Q$
-2. $V_T=Σ$
-3. $S=q_0$
-4. For production P:
-- a)P = ∅; 
-- b) For all values $δ(q, a) = (q1, q2,…, q_m)$ we have: P = P ∪ {$q → aq_i | i=1,m$} 
-- c) For all values $δ(q, a) = (q1, q2,…, q_m)$, if F ∩ {$q1, q2,…, q_m$} is not ∅ we have P = P ∪ {$q → a$}
+```cs
+private Token Number_Type()
+{
+    int begin = Position;
+    while (Has_Next_Token() && char.IsDigit(Input[Position])) { Position++; Column++; }
+    string value = Input.Substring(begin, Position - begin);
+    return new Token(TokenType.tok_num, value, Row, Column - value.Length);
+}
+```
+* In `Program3.cs` I outputted the case which user wants to check (only Dialogue, only Character, only Quest or Combined). Then program gets the path and outputs the result into new `output.txt` file.
 
-Next step was saying if FA is either eterministic or non-deterministic. Since it has the situation when after state $q_0$ after getting $a$ can get both to states $q_0$ and $q_1$ it is NFA (Non-Deterministic).
-
-Now I have to convert the NFA to DFA and to draw a graphical representation
-
-**1st Algorithm of conversion NFA to DFA (analytical conversion)**
-
-1. Initialize the initial state $q_0$ and this state add to the Q’: $Q'=∅;[q_0]'=q_0;Q'=${$[q_0]$}
-2. Determinate the transition function by the following rule: $δ(${$q_0,q_1,q_2,...,q_n$}$,a)=∪$ from i=1 to n δ($q_1$,a)
-3. For all states from $q_0,q_1,q_2,...,q_n$ is from Q', present $δ(${$q_0,q_1,q_2,...,q_n$}$,a)=${$p_0,p_1,p_2,...,p_n$} are from Σ. If {$p_0,p_1,p_2,...,p_n$} is not from Q', then it is included to the Q' and it is defined the transition function δ
-4. Repeat the $3^r$$^d$ step until occur the changes in Q'
-5. Define the set of final states as F'=({$q_0,q_1,q_2,...,q_n|q_i, 1<=i<=n,q_i$ is from F})
-
-**2nd Algorithm of conversion NFA to DFA (table conversion)**
-1. Create the state table for the given NFA
-2. Create a blank state table under possible input alphabets for the equivalent DFA
-3. Mark the start state of the DFA by $q_0$ (same as the NFA)
-4. Find out the combination of states {$q_0,q_1,...,q_n$} for each possible input alphabet
-5. Each time it is generated the new DFA state under the input alphabet columns, it should be applied the step 4 again, otherwise go to step 6.
-6. The states which contain any of the final states of the NFA are the final states of the equivalent DFA.
-
-## Results
-- Output 1:
+```cs
+switch(choice)
+{
+    case "1": filepath = "Samples\\character.txt"; break;
+    case "2": filepath = "Samples\\quest.txt"; break;
+    case "3": filepath = "Samples\\dialogue.txt"; break;
+    case "4": filepath = "Samples\\combined.txt"; break;
+    default: filepath = "Samples\\combined.txt"; break;
+}
+```
+## Input Example
 ```powershell
-Chomsky Type -> Type 3: Regular Grammar
-This is a Regular Grammar
+Quest {
+    name "Village Savior"
+    description "Far away from our Kingdom is located a village named OIIA. Dear warrior, guild wants you to get there and to settle up the situation with Goblins!"
+    briefly "Kill the Goblins in OIIA village"
+    reward {
+        Gold 341
+        STR | INT | AGI + 2
+        item "Potion" > name "LVL UP"
+        quest {
+            name "Lonely Lady"
+            status "Available"
+        }
+    }
+    status "Available and Accepted"
+}
 ```
+## Result Example
+```txt
+tok_Dialogue, Dialogue, Line: 1, Column 1
+tok_left_brace, {, Line: 1, Column 10
+tok_character_lines, characterLines, Line: 2, Column 5
+tok_str, John, Line: 2, Column 22
+tok_left_brace, {, Line: 3, Column 5
+tok_hello_line, helloLine, Line: 4, Column 9
+tok_str, Greetings, Line: 4, Column 21
+tok_quest_accepted, questAccepted, Line: 5, Column 9
+tok_str, I will do that for ya, pal!, Line: 5, Column 25
+tok_quest_declined, questDeclined, Line: 6, Column 9
+tok_str, I can't do that, Line: 6, Column 25
+tok_goodbye_line, goodbyeLine, Line: 7, Column 9
+tok_str, Farewell, Line: 7, Column 23
+tok_right_brace, }, Line: 8, Column 5
+tok_character_lines, characterLines, Line: 9, Column 5
+tok_str, Young Lady, Line: 9, Column 22
+tok_left_brace, {, Line: 10, Column 5
+tok_hello_line, helloLine, Line: 11, Column 9
+tok_str, Happy to see you again, Line: 11, Column 21
+tok_quest_to_accept, questToAccept, Line: 12, Column 9
+tok_str, I want you to help me, Line: 12, Column 25
+tok_after_quest_accepted, afterQuestAccepted, Line: 13, Column 9
+tok_str, I'm so happy!, Line: 13, Column 30
+tok_after_quest_declined, afterQuestDeclined, Line: 14, Column 9
+tok_str, Such a pity, Line: 14, Column 30
+tok_goodbye_line, goodbyeLine, Line: 15, Column 9
+tok_str, Have a good day, Line: 15, Column 23
+tok_right_brace, }, Line: 16, Column 5
+tok_right_brace, }, Line: 17, Column 1
 
+```
 
 ## Conclusion
-This laboratory work focused on implementing and analyzing core concepts from formal language theory, specifically grammars and finite automata.
-In the 2nd task, I successfully implemented functionality to determine the Chomsky Type of a grammar. By examining the structure of production rules, my program can accurately classify grammars into Type 0 (Unrestricted), Type 1 (Context-Sensitive), Type 2 (Context-Free), or Type 3 (Regular).
+Here’s a conclusion for your lab report:  
 
-The 3d task outlined for future implementation involves deeper exploration of finite automata, including:
-- Converting finite automata back to regular grammars
-- Determining whether an automaton is deterministic or non-deterministic
-- Implementing conversion from NDFA to DFA
-- Optional graphical representation of automata
+---
 
-These implementations will complete the bidirectional conversion between grammars and automata, demonstrate the equivalence of NFAs and DFAs, and provide visual representations to enhance understanding. Through this lab work, I've gained practical experience with formal language concepts, understanding the theoretical hierarchy of grammars and their relationship to different types of automata. These implementations provide a foundation for analyzing and manipulating formal languages computationally.
+## Conclusion  
+In this lab, we explored the fundamental concepts of lexical analysis and implemented a custom lexer to tokenize structured input. The lexer was designed to recognize keywords, identifiers, symbols, and literals, providing categorized tokens as output. By implementing a `TokenType` enum, a `Token` class, and a `Lexer` class, we structured the lexical analysis process efficiently. The program successfully parsed input files containing structured data, demonstrating its ability to process and categorize tokens accurately.  
+
+Through this implementation, we gained a deeper understanding of how lexers function as a critical component of compilers and interpreters. The project reinforced concepts such as tokenization, handling whitespace, and managing different token types while maintaining structured output. The final results confirm that the lexer can correctly process and identify tokens based on predefined rules, making it a useful foundation for further language processing tasks.
 ## References
 1. Cretu's GitHub Repository: https://github.com/filpatterson/DSL_laboratory_works/tree/master/1_RegularGrammars
 2. LFA ELSE Course: https://else.fcim.utm.md/course/view.php?id=98
