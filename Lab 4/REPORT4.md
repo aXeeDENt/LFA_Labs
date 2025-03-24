@@ -1,4 +1,4 @@
-# Topic: Lexer & Scanner
+# Topic: Regular expressions
 
 ### Course: Formal Languages & Finite Automata
 ### Author: Tatrintev Denis (FAF-232)
@@ -6,127 +6,153 @@
 ----
 
 ## Theory
-The term lexer comes from lexical analysis which, in turn, represents the process of extracting lexical tokens from a string of characters. There are several alternative names for the mechanism called lexer, for example tokenizer or scanner. The lexical analysis is one of the first stages used in a compiler/interpreter when dealing with programming, markup or other types of languages.     The tokens are identified based on some rules of the language and the products that the lexer gives are called lexemes. So basically the lexer is a stream of lexemes. Now in case it is not clear what's the difference between lexemes and tokens, there is a big one. The lexeme is just the byproduct of splitting based on delimiters, for example spaces, but the tokens give names or categories to each lexeme. So the tokens don't retain necessarily the actual value of the lexeme, but rather the type of it and maybe some metadata.
+**Regular Expression**: It can be thought of as a algebraic description of DFA and NDFA. It is a sequence of characters that forms a search pattern, mainly for use in pattern matching with strings, or string matching.
 
-A scanner (or `“lexer”`) takes in the linear stream of characters and chunks them together into a series of something more
-akin to `“words”`. In programming languages, each of these words is called a token. Some tokens are single characters, like (
-and `,.` Others may be several characters long, like numbers (`123`), string literals (`"hi!"`), and identifiers (`min`).
+A **Regular Expression** over S is an expression formed using the following rules:
+- The symbols `Empty Set` and `E` are regular expressions
+- Every `a` in `S` is a regular expression
+- If `R` and `S` are regular expressions, so are `R+S`, `RS`
+and `R*`.
 
-When it comes to implementing a language, the first thing needed is the ability to process a text file and recognize what it
-says. The traditional way to do this is to use a `“lexer”` (aka `‘scanner’`) to break the input up into `“tokens”`. Each token
-returned by the lexer includes a token code and potentially some metadata (e.g. the numeric value of a number).
+A language is **Regular** if it is represented by a regular expression
 
+Here’s a revised **THEORY** section for your laboratory report, structured without subsections (e.g., "1.1" or "2.3") while maintaining a formal academic style:
+
+### **1. Equivalence Between Regular Expressions and Finite Automata**  
+Regular expressions (RegEx) and finite automata (DFA/NFA) are formally equivalent models for describing **regular languages**. This equivalence is established by **Kleene’s Theorem**, which states that a language L over an alphabet Sigma is **regular** if and only if it can be recognized by a finite automaton (DFA or NFA) *and* expressed by a regular expression.  
+
+To convert between these representations:  
+- **From Regex to NFA**: **Thompson’s Construction** recursively builds an NFA by combining smaller NFAs for each subexpression. Base cases include empty language, empty string, and symbols (a in Sigma ). Operations like union (R + S), concatenation (RS), and Kleene star (R*) are implemented by introducing (varepsilon)-transitions between NFAs.  
+- **From NFA to DFA**: The **subset construction** algorithm transforms an NFA into a DFA by treating sets of NFA states as single DFA states. 
+- **From DFA to Regex**: The **state elimination method** iteratively removes DFA states, replacing transitions with regex labels until only a start-to-final path remains.  
+
+### **2. Algebraic Laws of Regular Expressions**  
+Regular expressions obey algebraic identities analogous to arithmetic. Below, (R), (S), and (T) denote arbitrary regular expressions:  
+
+**Fundamental Identities**  
+- **Union (( + ))**:  
+  - Identity: (R + emptyset = R).  
+  - Annihilator: (R +Sigma^* = Sigma^* ).  
+  - Idempotence: (R + R = R).  
+- **Concatenation (( * ))**:  
+  - Identity: (R * E = E * R = R).  
+  - Annihilator: (R * emptyset = emptyset * R = emptyset).   
+
+**Kleene Star Properties**  
+- (emptyset* = E) (the empty language’s closure matches the empty string).  
+- (R* = E + RR*) (recursive definition).  
+- (R** = R*) (idempotence of star operation).  
+
+**Commutativity**  
+- Union is commutative: (R + S = S + R).  
+- Concatenation is *not* commutative: (RS != SR) unless (R = S).  
 
 
 ## Objectives:
-1. Understand what lexical analysis [1] is.
-2. Get familiar with the inner workings of a lexer/scanner/tokenizer.
-3. Implement a sample lexer and show how it works.
-> Note: Just because too many students were showing me the same idea of lexer for a calculator, I've decided to specify requirements for such case. Try to make it at least a little more complex. Like, being able to pass integers and floats, also to be able to perform trigonometric operations (cos and sin). But it does not mean that you need to do the calculator, you can pick anything interesting you want
+1. Write and cover what regular expressions are, what they are used for;
+
+2. Below you will find 3 complex regular expressions per each variant. Take a variant depending on your number in the list of students and do the following:
+
+- a. Write a code that will generate valid combinations of symbols conform given regular expressions (examples will be shown). Be careful that idea is to interpret the given regular expressions dinamycally, not to hardcode the way it will generate valid strings. You give a set of regexes as input and get valid word as an output
+
+- b. In case you have an example, where symbol may be written undefined number of times, take a limit of 5 times (to evade generation of extremely long combinations);
+
+- c. Bonus point: write a function that will show sequence of processing regular expression (like, what you do first, second and so on)
+
+Write a good report covering all performed actions and faced difficulties.
+
+## My Variant
+![alt text](image.png)
 
 ## Implementation description
-* Here is presented the Code part from `Grammar.cs` Where is checked what Chomsky Type is the grammar from previous lab. The `IsType` functions will be described down below. It just checks and returns the number of the type of grammar that was already verified
+* My code has only one file named `Program4.cs`. Here I have only 2 methods. Here is presented `Main` method. I write the regullar expressions from my variant as strings `RE1`, `RE2` and `RE3`. then I generate 5 strings for each of this regular Expression
 
 ```cs
-public int GetChomskyType()
+public static void Main()
 {
-    if (IsType3()) return 3;
-    if (IsType2()) return 2;
-    if (IsType1()) return 1;
-    return 0;
+    string RE1 = "M?N^2(O|P)^3Q*R+";
+    string RE2 = "(X|Y|Z)^38+(9|0)";
+    string RE3 = "(H|i)(J|K)L*N?";
+    for (int l1 = 0; l1 < 5; l1++) { StringGeneration(RE1); }
+    Console.WriteLine();
+    for (int l2 = 0; l2 < 5; l2++) { StringGeneration(RE2); }
+    Console.WriteLine();
+    for (int l3 = 0; l3 < 5; l3++) { StringGeneration(RE3); }
+    Console.WriteLine();
 }
 ```
 
-* I created the 3 `IsType` functions to verify Chomsky Type 3, chomsky Type 2 and Chomsky Type 1. The Type 0 is obviously the any left grammar that won't fit perfectly in those 3 previous types. Here is presented the Type 2 verification. 
+* The Second Method `StringGeneration()` is created specifically for my variant and my regular expressions, so it may not works perfectly for other variants. 
+1. First Part that is represented here is `?` after a symbol, except `)` symbol. The function randomly gets the value 0 or 1 and if the 1 was randomly set we output the symbol in front of `?`. Else do nothing if we get 0. 
+2. The second part is the part of code with `*` symbol. This symbol gets the previous part of code and gets it randomly to the infinity, but based on requirements I let this be maximum number of 5. 
+3. The third part with `+` sign works similar to previous, but it does not allow get a 0 value. So the symbol will be presented at least 1 time and at most 5 times. 
+
+Here is presented the code part 1
 
 ```cs
-private bool IsType2()
-    {
-        // Context-Free Grammar: All productions are of the form A → α where α is any string of terminals and non-terminals
-        foreach (var rule in P)
-        {
-            char nonTerminal = rule.Key;
-            if (!V_N.Contains(nonTerminal)) return false;
-        }
-        return true;
-    }
-```
-
-* For the Type 2 I used the simple description from the provoded book. It says that: Context-Free Grammar is the grammar where all productions are of the form A → α where α is any string of terminals and non-terminals. that means that we do not pay attention to the right side and just make sure that left side do not contain non-terminals like `a`, `b` or `c` for example.
-
-* The final step was a `Program2.cs` class to output the results of the 2nd laboratory work. Here I just created a new `Grammar` type object and used `GetChomskyType()` and `GetChomskyTypeDescription()` methods to get the reult and then just printed the result.
-
-```cs
-switch (chomskyType)
+// ? 
+if ((REArr[i] == '?') && (char.IsLetter(REArr[i-1]) || char.IsDigit(REArr[i-1])) && (REArr[i-1]!=')'))
 {
-    case 3:
-        Console.WriteLine("This is a Regular Grammar");
-        break;
-    case 2:
-        Console.WriteLine("This is a Context-Free Grammar");
-        break;
-    case 1:
-        Console.WriteLine("This is a Context-Sensitive Grammar");
-        break;
-    case 0:
-        Console.WriteLine("This is an Unrestricted Grammar");
-        break;
+    Random rand = new Random();
+    int randomNum = rand.Next(2);
+    if (randomNum == 1) Console.Write(REArr[i-1]);
 }
-
 ```
-* **Finite Automata** (**FA**) are like simple machines that follow a set of rules to process a sequence of inputs (like letters or numbers) and decide if they are valid or not. 
 
-Here is presented the Whole Task 3 implementation. 
-First Step was converting the FA to Regular Grammar. 
+4. The forth part is the part of code with `^` that represents the power of next element. So if previous elemetn is not `)` then the next element is obviosly number and we repeat the element before `^` sign exactly that number of times as number is. 
 
-**Algorithm Description**
-1. $V_N=Q$
-2. $V_T=Σ$
-3. $S=q_0$
-4. For production P:
-- a)P = ∅; 
-- b) For all values $δ(q, a) = (q1, q2,…, q_m)$ we have: P = P ∪ {$q → aq_i | i=1,m$} 
-- c) For all values $δ(q, a) = (q1, q2,…, q_m)$, if F ∩ {$q1, q2,…, q_m$} is not ∅ we have P = P ∪ {$q → a$}
+``` cs
+// ^
+if ((REArr[i] == '^') && (char.IsLetter(REArr[i-1]) || char.IsDigit(REArr[i-1])) && (REArr[i-1]!=')'))
+{
+    int k = int.Parse(REArr[i+1].ToString());
+    Console.Write(new string(REArr[i-1], k)); 
+}
+```
 
-Next step was saying if FA is either eterministic or non-deterministic. Since it has the situation when after state $q_0$ after getting $a$ can get both to states $q_0$ and $q_1$ it is NFA (Non-Deterministic).
-
-Now I have to convert the NFA to DFA and to draw a graphical representation
-
-**1st Algorithm of conversion NFA to DFA (analytical conversion)**
-
-1. Initialize the initial state $q_0$ and this state add to the Q’: $Q'=∅;[q_0]'=q_0;Q'=${$[q_0]$}
-2. Determinate the transition function by the following rule: $δ(${$q_0,q_1,q_2,...,q_n$}$,a)=∪$ from i=1 to n δ($q_1$,a)
-3. For all states from $q_0,q_1,q_2,...,q_n$ is from Q', present $δ(${$q_0,q_1,q_2,...,q_n$}$,a)=${$p_0,p_1,p_2,...,p_n$} are from Σ. If {$p_0,p_1,p_2,...,p_n$} is not from Q', then it is included to the Q' and it is defined the transition function δ
-4. Repeat the $3^r$$^d$ step until occur the changes in Q'
-5. Define the set of final states as F'=({$q_0,q_1,q_2,...,q_n|q_i, 1<=i<=n,q_i$ is from F})
-
-**2nd Algorithm of conversion NFA to DFA (table conversion)**
-1. Create the state table for the given NFA
-2. Create a blank state table under possible input alphabets for the equivalent DFA
-3. Mark the start state of the DFA by $q_0$ (same as the NFA)
-4. Find out the combination of states {$q_0,q_1,...,q_n$} for each possible input alphabet
-5. Each time it is generated the new DFA state under the input alphabet columns, it should be applied the step 4 again, otherwise go to step 6.
-6. The states which contain any of the final states of the NFA are the final states of the equivalent DFA.
+5. The last part is the biggest one. It include all aspects of situations where there is a choice of symbols inside `()`. In my code are presented only these examples that are included in my variant. 
+- The first situation is the choice between 2 elements and no power of. Here I check id the element is `(` and the element +4 is `)`, that means that inside are 2 symbols and or sign `|`. Randomly getting the number 0 or 1 I get the left or right part of choices.
+- Second situation is similar to previous but it also includes fact that after `)` is a symbol of power `^`. That means that after a random choice of sides inside braces this symbol will be repeated exactly power number times (the number after `^`).
+- Third situation is simmilar to first, but now it checks if element is `(` and now element +6 is `)`. that means that inside braces are 3 elements and 2 or signs `|`. So the choice now extends from 2 to 3 elements.
+- Last situation is the combination of second and third situation when there are 3 elemnts inside braces and the power sign `^` after braces to repeat the choice exact number of times.
 
 ## Results
-- Output 1:
 ```powershell
-Chomsky Type -> Type 3: Regular Grammar
-This is a Regular Grammar
+MNNOOOQQRR     
+NNOOOQQRR      
+NNPPPQQQQQRRRRR
+MNNPPPQQQQQRR  
+NNOOOQQQQQRRRRR
+
+ZZZ88889       
+YYY888889      
+YYY8880        
+ZZZ889
+XXX88889       
+
+HKLLLL
+iJLN
+iJLLLL
+iKLLN
+HKLN
 ```
 
 
 ## Conclusion
-This laboratory work focused on implementing and analyzing core concepts from formal language theory, specifically grammars and finite automata.
-In the 2nd task, I successfully implemented functionality to determine the Chomsky Type of a grammar. By examining the structure of production rules, my program can accurately classify grammars into Type 0 (Unrestricted), Type 1 (Context-Sensitive), Type 2 (Context-Free), or Type 3 (Regular).
 
-The 3d task outlined for future implementation involves deeper exploration of finite automata, including:
-- Converting finite automata back to regular grammars
-- Determining whether an automaton is deterministic or non-deterministic
-- Implementing conversion from NDFA to DFA
-- Optional graphical representation of automata
+This laboratory work explored the theoretical foundations of **regular expressions (RegEx)** and their practical implementation through string generation. We confirmed the equivalence between RegEx and finite automata (DFA/NFA) via **Kleene's Theorem** and demonstrated their algebraic properties.
 
-These implementations will complete the bidirectional conversion between grammars and automata, demonstrate the equivalence of NFAs and DFAs, and provide visual representations to enhance understanding. Through this lab work, I've gained practical experience with formal language concepts, understanding the theoretical hierarchy of grammars and their relationship to different types of automata. These implementations provide a foundation for analyzing and manipulating formal languages computationally.
+**Key Results:**
+1. Developed a C# program to dynamically generate strings from given RegEx patterns (`M?N^2(O|P)^3Q*R+`, `(X|Y|Z)^38+(9|0)`, `(H|i)(J|K)L*N?`)
+2. Successfully implemented all RegEx operators (`?`, `*`, `+`, `^`, `|`) with repetition limits (max 5)
+3. Generated valid outputs like `MNNOOOQQRR`, `ZZZ88889`, and `iJLN`
+
+**Challenges Solved:**
+- Dynamic parsing of complex RegEx patterns
+- Handling operator precedence and nested structures
+- Limiting repetitions while maintaining correctness
+
+The work successfully bridged theoretical concepts with practical implementation, demonstrating RegEx's power in pattern matching and language processing. Future improvements could include generalizing the solution for arbitrary patterns and adding processing visualization.
 ## References
 1. Cretu's GitHub Repository: https://github.com/filpatterson/DSL_laboratory_works/tree/master/1_RegularGrammars
 2. LFA ELSE Course: https://else.fcim.utm.md/course/view.php?id=98

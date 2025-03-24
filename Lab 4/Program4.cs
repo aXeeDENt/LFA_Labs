@@ -100,6 +100,5 @@ class Program4
         Console.WriteLine();
         for (int l3 = 0; l3 < 5; l3++) { StringGeneration(RE3); }
         Console.WriteLine();
-
     }
 }
